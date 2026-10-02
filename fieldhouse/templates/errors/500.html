@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}500 - Server Error{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <i class="bi bi-exclamation-octagon display-1 text-warning"></i>
+  <h2 class="fw-bold mt-3">500 - Something Went Wrong</h2>
+  {% if db_error %}
+  <p class="text-muted">We couldn't connect to the database. Please check your MySQL server and .env configuration.</p>
+  {% else %}
+  <p class="text-muted">An unexpected error occurred. Please try again.</p>
+  {% endif %}
+  <a href="{{ url_for('dashboard.index') if session.get('user_id') else url_for('auth.login') }}" class="btn btn-primary">Go Home</a>
+</div>
+{% endblock %}

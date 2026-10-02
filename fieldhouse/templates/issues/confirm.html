@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Confirm Issue{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-clipboard-check"></i> Confirm Equipment Issue</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <p class="text-muted">Please review the details below before issuing the equipment.</p>
+    <table class="table">
+      <tr><th style="width:220px;">Member</th><td>{{ member.full_name }} ({{ member.student_code }})</td></tr>
+      <tr><th>Equipment</th><td>{{ eq.equipment_name }}</td></tr>
+      <tr><th>Quantity</th><td>{{ quantity }}</td></tr>
+      <tr><th>Available Before Issue</th><td>{{ eq.available_quantity }}</td></tr>
+      <tr><th>Available After Issue</th><td>{{ eq.available_quantity - quantity }}</td></tr>
+      <tr><th>Expected Return Date</th><td>{{ expected_return_date }}</td></tr>
+      <tr><th>Condition Before Issue</th><td>{{ condition_before }}</td></tr>
+      <tr><th>Remarks</th><td>{{ remarks or '—' }}</td></tr>
+    </table>
+
+    <form method="POST" action="{{ url_for('issues.add_issue') }}">
+      <input type="hidden" name="member_id" value="{{ member.member_id }}">
+      <input type="hidden" name="equipment_id" value="{{ eq.equipment_id }}">
+      <input type="hidden" name="quantity" value="{{ quantity }}">
+      <input type="hidden" name="expected_return_date" value="{{ expected_return_date }}">
+      <input type="hidden" name="condition_before_issue" value="{{ condition_before }}">
+      <input type="hidden" name="remarks" value="{{ remarks }}">
+      <input type="hidden" name="confirmed" value="yes">
+      <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Confirm & Issue</button>
+      <a href="{{ url_for('issues.add_issue') }}" class="btn btn-outline-secondary">Back</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

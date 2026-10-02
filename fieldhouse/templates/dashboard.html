@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Overview — Fieldhouse{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <span class="page-eyebrow">{{ current_role }} console</span>
+    <h1 class="page-title"><i class="bi bi-grid-1x2"></i> Overview</h1>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-steel">
+      <div class="fh-stat-value">{{ stats.total_equipment }}</div>
+      <div class="fh-stat-label">Total Equipment</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-green">
+      <div class="fh-stat-value">{{ stats.available_equipment }}</div>
+      <div class="fh-stat-label">Available</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-steel">
+      <div class="fh-stat-value">{{ stats.issued_equipment }}</div>
+      <div class="fh-stat-label">Checked Out</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-amber">
+      <div class="fh-stat-value">{{ stats.maintenance_equipment }}</div>
+      <div class="fh-stat-label">In Repair</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-red">
+      <div class="fh-stat-value">{{ stats.damaged_equipment }}</div>
+      <div class="fh-stat-label">Damaged</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-red">
+      <div class="fh-stat-value">{{ stats.lost_equipment }}</div>
+      <div class="fh-stat-label">Lost</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-steel">
+      <div class="fh-stat-value">{{ stats.total_members }}</div>
+      <div class="fh-stat-label">Members</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="fh-stat-tile t-amber">
+      <div class="fh-stat-value">{{ stats.active_borrowings }}</div>
+      <div class="fh-stat-label">Active Custody</div>
+    </div>
+  </div>
+</div>
+
+{% if stats.overdue_returns > 0 %}
+<div class="alert alert-danger fh-alert mb-4">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <strong>{{ stats.overdue_returns }}</strong> item{{ 's' if stats.overdue_returns != 1 else '' }} overdue for return.
+  <a href="{{ url_for('issues.list_issues', status='Issued') }}" class="alert-link">Review now</a>
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card fh-chart-card">
+      <div class="card-body">
+        <div class="fh-chart-title">Equipment by Category</div>
+        <canvas id="categoryChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card fh-chart-card">
+      <div class="card-body">
+        <div class="fh-chart-title">Available vs Checked Out</div>
+        <canvas id="availabilityChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card fh-chart-card">
+      <div class="card-body">
+        <div class="fh-chart-title">Monthly Check-Out / Check-In</div>
+        <canvas id="monthlyChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card fh-chart-card">
+      <div class="card-body">
+        <div class="fh-chart-title">Damaged vs Lost</div>
+        <canvas id="damageLostChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.color = '#6b7686';
+
+const categoryLabels = {{ charts.category_labels | tojson }};
+const categoryCounts = {{ charts.category_counts | tojson }};
+new Chart(document.getElementById('categoryChart'), {
+  type: 'bar',
+  data: { labels: categoryLabels, datasets: [{ label: 'Equipment Count', data: categoryCounts,
+    backgroundColor: '#3E7CB1', borderRadius: 4 }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
+});
+
+new Chart(document.getElementById('availabilityChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Available', 'Checked Out'],
+    datasets: [{ data: [{{ charts.availability.available }}, {{ charts.availability.issued }}],
+      backgroundColor: ['#2F9E5B', '#3E7CB1'], borderWidth: 0 }]
+  },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+const monthlyLabels = {{ charts.monthly_labels | tojson }};
+const monthlyIssuesMap = {{ charts.monthly_issues | tojson }};
+const monthlyReturnsMap = {{ charts.monthly_returns | tojson }};
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'line',
+  data: {
+    labels: monthlyLabels,
+    datasets: [
+      { label: 'Checked Out', data: monthlyLabels.map(m => monthlyIssuesMap[m] || 0), borderColor: '#3E7CB1', backgroundColor: 'transparent', tension: 0.3 },
+      { label: 'Checked In', data: monthlyLabels.map(m => monthlyReturnsMap[m] || 0), borderColor: '#2F9E5B', backgroundColor: 'transparent', tension: 0.3 }
+    ]
+  },
+  options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('damageLostChart'), {
+  type: 'pie',
+  data: {
+    labels: {{ charts.damage_lost_labels | tojson }},
+    datasets: [{ data: {{ charts.damage_lost_counts | tojson }}, backgroundColor: ['#D9483F', '#8a97a6'], borderWidth: 0 }]
+  },
+  options: { plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

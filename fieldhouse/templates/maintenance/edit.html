@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Update Maintenance Record{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-pencil"></i> Update Maintenance Record</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <table class="table table-sm mb-4">
+      <tr><th>Equipment</th><td>{{ record.equipment_id }}</td></tr>
+      <tr><th>Type</th><td>{{ record.maintenance_type }}</td></tr>
+      <tr><th>Problem</th><td>{{ record.problem_description }}</td></tr>
+      <tr><th>Start Date</th><td>{{ record.start_date }}</td></tr>
+      <tr><th>Technician/Vendor</th><td>{{ record.technician_vendor }}</td></tr>
+    </table>
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if record.status==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Actual Completion Date</label>
+          <input type="date" class="form-control" name="actual_completion_date" value="{{ record.actual_completion_date }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Cost (₹)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="cost" value="{{ record.cost }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2">{{ record.remarks or '' }}</textarea>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="return_to_service" id="returnSvc">
+            <label class="form-check-label" for="returnSvc">Mark as Completed and return equipment to available inventory</label>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Update Record</button>
+        <a href="{{ url_for('maintenance.list_maintenance') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

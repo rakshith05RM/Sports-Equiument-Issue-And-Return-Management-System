@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Maintenance{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-tools"></i> Equipment Maintenance</h1>
+  <a href="{{ url_for('maintenance.add_maintenance') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add Maintenance Record</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All</option>
+          {% for s in statuses %}
+          <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-search"></i> Filter</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Equipment</th><th>Type</th><th>Start Date</th><th>Expected Completion</th><th>Cost</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td>{{ r.equipment_name }}</td>
+            <td>{{ r.maintenance_type or '—' }}</td>
+            <td>{{ r.start_date }}</td>
+            <td>{{ r.expected_completion_date or '—' }}</td>
+            <td>₹{{ r.cost }}</td>
+            <td>
+              {% set badge_map = {'Pending':'warning','In Progress':'info','Completed':'success','Cancelled':'secondary'} %}
+              <span class="badge bg-{{ badge_map.get(r.status,'secondary') }}">{{ r.status }}</span>
+            </td>
+            <td class="text-end">
+              <a href="{{ url_for('maintenance.edit_maintenance', maintenance_id=r.maintenance_id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No maintenance records.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

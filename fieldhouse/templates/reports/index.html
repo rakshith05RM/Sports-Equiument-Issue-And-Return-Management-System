@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-file-earmark-bar-graph"></i> Reports</h1>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Report Type</label>
+        <select class="form-select" name="report" onchange="this.form.submit()">
+          {% for key, label in report_types.items() %}
+          <option value="{{ key }}" {% if report_key==key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-muted">Category</label>
+        <select class="form-select" name="category_id">
+          <option value="">All</option>
+          {% for c in categories %}
+          <option value="{{ c.category_id }}" {% if filters.category_id|string == c.category_id|string %}selected{% endif %}>{{ c.category_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-muted">Member</label>
+        <select class="form-select" name="member_id">
+          <option value="">All</option>
+          {% for m in members %}
+          <option value="{{ m.member_id }}" {% if filters.member_id|string == m.member_id|string %}selected{% endif %}>{{ m.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-muted">From Date</label>
+        <input type="date" class="form-control" name="date_from" value="{{ filters.date_from or '' }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-muted">To Date</label>
+        <input type="date" class="form-control" name="date_to" value="{{ filters.date_to or '' }}">
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0">{{ report_types[report_key] }} ({{ rows|length }} record(s))</h6>
+      <a class="btn btn-outline-success btn-sm"
+         href="{{ url_for('reports.export_csv', report=report_key, category_id=filters.category_id, status=filters.status, date_from=filters.date_from, date_to=filters.date_to, member_id=filters.member_id, equipment_id=filters.equipment_id) }}">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle table-sm">
+        <thead>
+          <tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            {% for value in row.values() %}<td>{{ value if value is not none else '—' }}</td>{% endfor %}
+          </tr>
+          {% else %}
+          <tr><td colspan="{{ headers|length }}" class="text-center text-muted py-4">No data for this report.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

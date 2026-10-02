@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Equipment Issues{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-box-arrow-up-right"></i> Equipment Issues</h1>
+  <a href="{{ url_for('issues.add_issue') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Issue Equipment</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All</option>
+          {% for s in ['Issued','Returned','Partially Returned','Overdue','Damaged','Lost'] %}
+          <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-search"></i> Filter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Member</th><th>Equipment</th><th>Qty</th><th>Issue Date</th><th>Expected Return</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          {% for i in issues %}
+          <tr class="{{ 'table-danger' if i.is_overdue else '' }}">
+            <td>{{ i.member_name }} <span class="text-muted small">({{ i.student_code }})</span></td>
+            <td>{{ i.equipment_name }}</td>
+            <td>{{ i.quantity }}</td>
+            <td>{{ i.issue_date }}</td>
+            <td>{{ i.expected_return_date }} {% if i.is_overdue %}<span class="badge bg-danger">Overdue</span>{% endif %}</td>
+            <td>
+              {% set badge_map = {'Issued':'primary','Returned':'success','Partially Returned':'info','Overdue':'danger','Damaged':'warning','Lost':'secondary'} %}
+              <span class="badge bg-{{ badge_map.get(i.return_status,'secondary') }}">{{ i.return_status }}</span>
+            </td>
+            <td class="text-end">
+              <a href="{{ url_for('issues.view_issue', issue_id=i.issue_id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+              {% if i.return_status in ['Issued','Partially Returned'] %}
+              <a href="{{ url_for('returns.add_return', issue_id=i.issue_id) }}" class="btn btn-sm btn-outline-success"><i class="bi bi-box-arrow-in-left"></i> Return</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No issue records found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

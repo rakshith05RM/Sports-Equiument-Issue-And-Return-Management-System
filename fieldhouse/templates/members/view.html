@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ member.full_name }} - Member Details{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-person"></i> {{ member.full_name }}</h1>
+  <a href="{{ url_for('members.list_members') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Member Details</h6>
+        <table class="table table-sm">
+          <tr><th>Student ID</th><td>{{ member.student_code }}</td></tr>
+          <tr><th>Email</th><td>{{ member.email or '—' }}</td></tr>
+          <tr><th>Phone</th><td>{{ member.phone or '—' }}</td></tr>
+          <tr><th>Gender</th><td>{{ member.gender or '—' }}</td></tr>
+          <tr><th>Department</th><td>{{ member.department or '—' }}</td></tr>
+          <tr><th>Course/Class</th><td>{{ member.course_class or '—' }}</td></tr>
+          <tr><th>Status</th><td><span class="badge bg-{{ 'success' if member.status=='Active' else 'secondary' }}">{{ member.status }}</span></td></tr>
+          <tr><th>Registered</th><td>{{ member.registration_date }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Borrowing History</h6>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Equipment</th><th>Qty</th><th>Issue Date</th><th>Expected Return</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for h in borrow_history %}
+              <tr>
+                <td>{{ h.equipment_name }}</td><td>{{ h.quantity }}</td>
+                <td>{{ h.issue_date }}</td><td>{{ h.expected_return_date }}</td>
+                <td><span class="badge bg-secondary">{{ h.return_status }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" class="text-muted text-center">No borrowing history.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

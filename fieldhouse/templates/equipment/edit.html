@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Edit Equipment{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-pencil"></i> Edit Equipment</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Equipment Name *</label>
+          <input type="text" class="form-control" name="equipment_name" value="{{ item.equipment_name }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Category *</label>
+          <select class="form-select" name="category_id" required>
+            {% for c in categories %}
+            <option value="{{ c.category_id }}" {% if item.category_id == c.category_id %}selected{% endif %}>{{ c.category_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Brand</label>
+          <input type="text" class="form-control" name="brand" value="{{ item.brand or '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Model</label>
+          <input type="text" class="form-control" name="model" value="{{ item.model or '' }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" name="description" rows="2">{{ item.description or '' }}</textarea>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Total Quantity *</label>
+          <input type="number" min="0" class="form-control" name="total_quantity" value="{{ item.total_quantity }}" required>
+          <div class="form-text">Currently issued: {{ item.total_quantity - item.available_quantity }}</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Purchase Date</label>
+          <input type="date" class="form-control" name="purchase_date" value="{{ item.purchase_date }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Purchase Price (₹)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="purchase_price" value="{{ item.purchase_price }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Condition</label>
+          <select class="form-select" name="condition_status">
+            {% for cond in conditions %}
+            <option value="{{ cond }}" {% if item.condition_status == cond %}selected{% endif %}>{{ cond }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-control" name="location" value="{{ item.location or '' }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if item.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Supplier</label>
+          <input type="text" class="form-control" name="supplier" value="{{ item.supplier or '' }}">
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Update Equipment</button>
+        <a href="{{ url_for('equipment.list_equipment') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

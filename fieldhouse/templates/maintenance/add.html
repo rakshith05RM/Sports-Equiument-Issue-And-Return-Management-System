@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Add Maintenance Record{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-plus-circle"></i> Add Maintenance Record</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Equipment *</label>
+          <select class="form-select" name="equipment_id" required>
+            <option value="">Select equipment</option>
+            {% for e in equipment_list %}
+            <option value="{{ e.equipment_id }}" {% if form.get('equipment_id')|string == e.equipment_id|string %}selected{% endif %}>{{ e.equipment_name }} (Available: {{ e.available_quantity }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Maintenance Type</label>
+          <input type="text" class="form-control" name="maintenance_type" value="{{ form.get('maintenance_type','') }}" placeholder="e.g. Repair, Cleaning, Inspection">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Problem Description</label>
+          <textarea class="form-control" name="problem_description" rows="2">{{ form.get('problem_description','') }}</textarea>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Start Date *</label>
+          <input type="date" class="form-control" name="start_date" value="{{ form.get('start_date','') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Expected Completion Date</label>
+          <input type="date" class="form-control" name="expected_completion_date" value="{{ form.get('expected_completion_date','') }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Cost (₹)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="cost" value="{{ form.get('cost','0') }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Technician/Vendor</label>
+          <input type="text" class="form-control" name="technician_vendor" value="{{ form.get('technician_vendor','') }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Quantity Affected</label>
+          <input type="number" min="1" class="form-control" name="quantity" value="{{ form.get('quantity','1') }}">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="take_out_of_service" id="takeOut" checked>
+            <label class="form-check-label" for="takeOut">Take units out of service now</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2">{{ form.get('remarks','') }}</textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Record</button>
+        <a href="{{ url_for('maintenance.list_maintenance') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

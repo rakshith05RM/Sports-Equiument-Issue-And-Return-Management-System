@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Damaged / Lost Equipment{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-exclamation-triangle"></i> Damaged / Lost Equipment</h1>
+  <a href="{{ url_for('damage.add_damage') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Report Damage/Loss</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Type</label>
+        <select class="form-select" name="type">
+          <option value="">All</option>
+          <option value="Damaged" {% if report_type=='Damaged' %}selected{% endif %}>Damaged</option>
+          <option value="Lost" {% if report_type=='Lost' %}selected{% endif %}>Lost</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All</option>
+          {% for s in statuses %}
+          <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2"><button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-search"></i> Filter</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Equipment</th><th>Member</th><th>Type</th><th>Qty</th><th>Report Date</th><th>Est. Cost</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+          {% for r in reports %}
+          <tr>
+            <td>{{ r.equipment_name }}</td>
+            <td>{{ r.member_name or '—' }}</td>
+            <td><span class="badge bg-{{ 'danger' if r.report_type=='Damaged' else 'secondary' }}">{{ r.report_type }}</span></td>
+            <td>{{ r.quantity }}</td>
+            <td>{{ r.report_date }}</td>
+            <td>₹{{ r.estimated_cost }}</td>
+            <td><span class="badge bg-info">{{ r.status }}</span></td>
+            <td class="text-end">
+              {% if current_role == 'Admin' %}
+              <a href="{{ url_for('damage.edit_damage', report_id=r.report_id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="text-center text-muted py-4">No damage/loss reports.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Team — Fieldhouse{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <span class="page-eyebrow">Access control</span>
+    <h1 class="page-title"><i class="bi bi-person-badge"></i> Team</h1>
+  </div>
+</div>
+
+{% if pending_count > 0 %}
+<div class="alert alert-warning fh-alert mb-3">
+  <i class="bi bi-hourglass-split"></i>
+  <strong>{{ pending_count }}</strong> account request{{ 's' if pending_count != 1 else '' }} waiting for approval.
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Requested</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td class="fw-semibold">{{ u.full_name }}</td>
+            <td><span class="fh-code">{{ u.username }}</span></td>
+            <td>{{ u.email }}</td>
+            <td>
+              <form method="POST" action="{{ url_for('team.change_role', user_id=u.user_id) }}" class="d-inline">
+                <select name="role" class="form-select form-select-sm d-inline-block" style="width:auto;" onchange="this.form.submit()" {% if u.user_id == session.get('user_id') %}disabled{% endif %}>
+                  <option value="Staff" {% if u.role=='Staff' %}selected{% endif %}>Staff</option>
+                  <option value="Admin" {% if u.role=='Admin' %}selected{% endif %}>Admin</option>
+                </select>
+              </form>
+            </td>
+            <td>
+              {% if u.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">{{ u.created_at }}</td>
+            <td class="text-end">
+              {% if not u.is_active %}
+              <form method="POST" action="{{ url_for('team.approve_user', user_id=u.user_id) }}" class="d-inline">
+                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-check-lg"></i> Approve</button>
+              </form>
+              {% else %}
+              <form method="POST" action="{{ url_for('team.deactivate_user', user_id=u.user_id) }}" class="d-inline">
+                <button class="btn btn-sm btn-outline-secondary" {% if u.user_id == session.get('user_id') %}disabled{% endif %}>
+                  <i class="bi bi-slash-circle"></i> Deactivate
+                </button>
+              </form>
+              {% endif %}
+              <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delUser{{ u.user_id }}" {% if u.user_id == session.get('user_id') %}disabled{% endif %}>
+                <i class="bi bi-trash"></i>
+              </button>
+              <div class="modal fade" id="delUser{{ u.user_id }}" tabindex="-1">
+                <div class="modal-dialog"><div class="modal-content">
+                  <div class="modal-body">Delete <strong>{{ u.full_name }}</strong>'s account? This cannot be undone.</div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('team.delete_user', user_id=u.user_id) }}">
+                      <button class="btn btn-danger" type="submit">Delete</button>
+                    </form>
+                  </div>
+                </div></div>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No team members yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

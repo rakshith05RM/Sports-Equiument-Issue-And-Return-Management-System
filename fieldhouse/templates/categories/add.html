@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Add Category{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-plus-circle"></i> Add Category</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Category Name *</label>
+        <input type="text" class="form-control" name="category_name" value="{{ form.get('category_name','') }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" name="description" rows="3">{{ form.get('description','') }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Category</button>
+      <a href="{{ url_for('categories.list_categories') }}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

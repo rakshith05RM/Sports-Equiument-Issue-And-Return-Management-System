@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Issue Equipment{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-box-arrow-up-right"></i> Issue Equipment</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Member *</label>
+          <select class="form-select" name="member_id" required>
+            <option value="">Select member</option>
+            {% for m in members %}
+            <option value="{{ m.member_id }}" {% if form.get('member_id')|string == m.member_id|string %}selected{% endif %}>{{ m.full_name }} ({{ m.student_code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Equipment *</label>
+          <select class="form-select" name="equipment_id" required>
+            <option value="">Select equipment</option>
+            {% for e in equipment_list %}
+            <option value="{{ e.equipment_id }}" {% if form.get('equipment_id')|string == e.equipment_id|string %}selected{% endif %}>
+              {{ e.equipment_name }} (Available: {{ e.available_quantity }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Quantity *</label>
+          <input type="number" min="1" class="form-control" name="quantity" value="{{ form.get('quantity','1') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Expected Return Date *</label>
+          <input type="date" class="form-control" name="expected_return_date" value="{{ form.get('expected_return_date','') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Condition Before Issue</label>
+          <input type="text" class="form-control" name="condition_before_issue" value="{{ form.get('condition_before_issue','') }}" placeholder="e.g. Good">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2">{{ form.get('remarks','') }}</textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right-circle"></i> Continue to Confirm</button>
+        <a href="{{ url_for('issues.list_issues') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

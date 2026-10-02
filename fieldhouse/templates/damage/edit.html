@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Update Damage/Loss Report{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-pencil"></i> Update Damage/Loss Report</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <table class="table table-sm mb-4">
+      <tr><th>Type</th><td>{{ report.report_type }}</td></tr>
+      <tr><th>Quantity</th><td>{{ report.quantity }}</td></tr>
+      <tr><th>Description</th><td>{{ report.description }}</td></tr>
+      <tr><th>Report Date</th><td>{{ report.report_date }}</td></tr>
+    </table>
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if report.status==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Estimated Cost (₹)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="estimated_cost" value="{{ report.estimated_cost }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Resolution</label>
+          <textarea class="form-control" name="resolution" rows="2">{{ report.resolution or '' }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2">{{ report.remarks or '' }}</textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Update Report</button>
+        <a href="{{ url_for('damage.list_damage') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

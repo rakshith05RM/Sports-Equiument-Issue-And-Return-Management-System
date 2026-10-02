@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Issue Details{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title"><i class="bi bi-box-arrow-up-right"></i> Issue #{{ issue.issue_id }}</h1>
+  <a href="{{ url_for('issues.list_issues') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Issue Information</h6>
+        <table class="table table-sm">
+          <tr><th>Member</th><td>{{ issue.member_name }} ({{ issue.student_code }})</td></tr>
+          <tr><th>Equipment</th><td>{{ issue.equipment_name }}</td></tr>
+          <tr><th>Quantity</th><td>{{ issue.quantity }}</td></tr>
+          <tr><th>Issue Date</th><td>{{ issue.issue_date }}</td></tr>
+          <tr><th>Expected Return</th><td>{{ issue.expected_return_date }}</td></tr>
+          <tr><th>Actual Return</th><td>{{ issue.actual_return_date or '—' }}</td></tr>
+          <tr><th>Issued By</th><td>{{ issue.issued_by_name }}</td></tr>
+          <tr><th>Status</th><td><span class="badge bg-secondary">{{ issue.return_status }}</span></td></tr>
+          <tr><th>Condition Before</th><td>{{ issue.condition_before_issue or '—' }}</td></tr>
+          <tr><th>Condition After</th><td>{{ issue.condition_after_return or '—' }}</td></tr>
+          <tr><th>Remarks</th><td>{{ issue.remarks or '—' }}</td></tr>
+        </table>
+        {% if issue.return_status in ['Issued','Partially Returned'] %}
+        <a href="{{ url_for('returns.add_return', issue_id=issue.issue_id) }}" class="btn btn-success">
+          <i class="bi bi-box-arrow-in-left"></i> Record Return
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Return Records</h6>
+        <table class="table table-sm">
+          <thead><tr><th>Qty</th><th>Date</th><th>Condition</th><th>Damaged?</th></tr></thead>
+          <tbody>
+            {% for r in returns %}
+            <tr>
+              <td>{{ r.returned_quantity }}</td><td>{{ r.return_date }}</td>
+              <td>{{ r.condition_after_return }}</td>
+              <td>{{ 'Yes' if r.is_damaged else 'No' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted text-center">No returns recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

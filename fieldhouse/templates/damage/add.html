@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Report Damage/Loss{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-exclamation-triangle"></i> Report Damaged / Lost Equipment</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Equipment *</label>
+          <select class="form-select" name="equipment_id" required>
+            <option value="">Select equipment</option>
+            {% for e in equipment_list %}
+            <option value="{{ e.equipment_id }}" {% if form.get('equipment_id')|string == e.equipment_id|string %}selected{% endif %}>{{ e.equipment_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Member (if applicable)</label>
+          <select class="form-select" name="member_id">
+            <option value="">N/A</option>
+            {% for m in members %}
+            <option value="{{ m.member_id }}" {% if form.get('member_id')|string == m.member_id|string %}selected{% endif %}>{{ m.full_name }} ({{ m.student_code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Type *</label>
+          <select class="form-select" name="report_type" required>
+            <option value="Damaged">Damaged</option>
+            <option value="Lost">Lost</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Quantity *</label>
+          <input type="number" min="1" class="form-control" name="quantity" value="{{ form.get('quantity','1') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Estimated Cost (₹)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="estimated_cost" value="{{ form.get('estimated_cost','0') }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" name="description" rows="2">{{ form.get('description','') }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2">{{ form.get('remarks','') }}</textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Submit Report</button>
+        <a href="{{ url_for('damage.list_damage') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

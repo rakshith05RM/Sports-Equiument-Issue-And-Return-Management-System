@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Record Return{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><i class="bi bi-box-arrow-in-left"></i> Record Return</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="alert alert-secondary">
+      <strong>{{ issue.member_name }}</strong> borrowed <strong>{{ issue.quantity }}</strong> of
+      <strong>{{ issue.equipment_name }}</strong> on {{ issue.issue_date }} — outstanding: <strong>{{ remaining }}</strong>
+    </div>
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Returned Quantity *</label>
+          <input type="number" min="1" max="{{ remaining }}" class="form-control" name="returned_quantity" value="{{ remaining }}" required>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Condition After Return *</label>
+          <input type="text" class="form-control" name="condition_after_return" placeholder="e.g. Good, Fair, Damaged" required>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="is_damaged" id="isDamaged">
+            <label class="form-check-label" for="isDamaged">Equipment is damaged</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="is_lost" id="isLost">
+            <label class="form-check-label" for="isLost">Equipment is lost (not physically returned)</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Damage/Loss Description (if applicable)</label>
+          <textarea class="form-control" name="damage_description" rows="2"></textarea>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Estimated Cost (if damaged/lost)</label>
+          <input type="number" min="0" step="0.01" class="form-control" name="estimated_cost" value="0">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" name="remarks" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Confirm Return</button>
+        <a href="{{ url_for('returns.pending_returns') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
